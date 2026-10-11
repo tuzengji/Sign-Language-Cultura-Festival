@@ -299,10 +299,10 @@
   }
 
   function swapCharacter(nextSrc) {
-    $character.classList.remove("is-swapping-in");
-    $character.classList.add("is-swapping-out");
     const ghost = new Image();
-    ghost.onload = ghost.onerror = () => {
+    ghost.onload = () => {
+      if (nextSrc !== lastSrc) return;
+      $character.classList.remove("is-swapping-in");
       $character.src = nextSrc;
       $character.classList.remove("is-swapping-out");
       // force reflow so animation re-triggers
