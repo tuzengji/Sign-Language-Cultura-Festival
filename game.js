@@ -115,7 +115,7 @@
         btn.dataset.value = String(item.value);
         btn.innerHTML = `
           <div class="card__img-wrap">
-            <img class="card__img" src="${item.src}" alt="${SLOT_LABEL[slot]}手语 № ${item.value}" loading="lazy" draggable="false">
+            <img class="card__img" src="${item.src}" alt="${SLOT_LABEL[slot]}手语 № ${item.value}" loading="eager" draggable="false">
           </div>
           <span class="card__num">${item.value.toString().padStart(2, "0")}</span>
           <span class="card__hint">${SLOT_HINT[slot]}</span>
@@ -211,7 +211,7 @@
   function itemCardHTML(it, slot) {
     const slotCls = `stage-item--${slot}`;
     return `<div class="stage-item ${slotCls}" data-slot-value="${it.value}">
-      <img class="stage-item__img" src="${it.item}" alt="${it.label}" loading="lazy" draggable="false">
+      <img class="stage-item__img" src="${it.item}" alt="${it.label}" loading="eager" draggable="false">
     </div>`;
   }
   function syncStageItems() {
@@ -712,33 +712,6 @@
         }
       });
     }
-  }
-
-  /* ── Preload character images (idle) ─────────────────────────────────────── */
-  function preloadCharacters() {
-    const paths = ["assets/characters/start.png", "assets/characters/000.png"];
-    const tops = [1, 2, 3, 4];
-    const bottoms = [1, 2, 3, 4];
-    const shoes = [1, 2, 3, 4];
-    for (const t of tops) {
-      paths.push(`assets/characters/${t}00.png`);
-      for (const b of bottoms) {
-        paths.push(`assets/characters/${t}${b}0.png`);
-        for (const s of shoes) {
-          // tb-only "144" / "414" combos render shoe digit 5 instead.
-          const sFinal = (s === 4 && SHOE4_FALLBACK.has(`${t}${b}`)) ? 5 : s;
-          paths.push(`assets/characters/${t}${b}${sFinal}.png`);
-        }
-      }
-    }
-
-    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 600));
-    idle(() => {
-      paths.forEach((src) => {
-        const img = new Image();
-        img.src = src;
-      });
-    });
   }
 
   /* ── Mouse-following petal trail ─────────────────────────────────────────── */
@@ -1326,7 +1299,6 @@
         setExpanded(slot);
       });
     });
-    preloadCharacters();
     initPetalTrail();
     loadUserId();
     loadNickname();
