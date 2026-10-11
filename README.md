@@ -6,7 +6,7 @@
 
 整站是**纯静态前端 + 单文件 Node 服务**，零依赖、零构建步骤、整个项目放进一台 Windows 主机就能给整个校园网用。
 
-🌸 **GitHub**：<https://github.com/WishingCat/Sign-Language-Cultura-Festival>
+🌸 **GitHub**：<https://github.com/tuzengji/Sign-Language-Cultura-Festival>
 
 ---
 
@@ -122,3 +122,16 @@ POST /api/messages/:id/flower { uid }                            → 送花，�
 - 字体：[霞鹜文楷](https://github.com/lxgw/LxgwWenKai) / [Fraunces](https://fraun.ces/)
 
 ✿ 春日特辑 · MMXXVI
+
+## 以手予爱正式部署（2026-10-11）
+
+- 正式入口：https://shouyulove.cn/2026-sign-language-cultural-festival/
+- 设计者：周丽敏 涂增基 黄庭逸
+- 说明：服务于 2026 年手语文化节的小游戏网页～
+- Node 通过 Nginx 子路径反向代理，前端使用相对 API 地址；保留本地根路径启动方式。
+- 服务 `sign-language-festival.service`，只监听 `127.0.0.1:8041`；发布目录 `/opt/sign-language-festival/current`。
+- `DATA_DIR=/var/lib/sign-language-festival` 保存玩家数据，独立于代码发布；正式环境 `SEED=off`，不自动加入模拟玩家。
+- 仅在回环监听且前置 Nginx 覆盖 `X-Real-IP` 时设置 `TRUST_PROXY=1`，让限流按真实访客计算。
+- 发布白名单：`index.html`、`styles.css`、`game.js`、`assets/` 图片与 `server/server.mjs`。历史玩家数据、文档及开发文件不发布。
+- 静态服务只允许页面、脚本、样式和图片，禁止下载服务源码与数据文件。
+- 配置在 `deploy/`。回滚时将 `current` 切回保留的版本并重启本服务；数据目录不随版本切换。

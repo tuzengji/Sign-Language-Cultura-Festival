@@ -334,7 +334,7 @@
     // Step 1: server-side check and register the nickname (sequential UID)
     if ($startBtn) $startBtn.disabled = true;
     try {
-      const res = await fetch("/api/users", {
+      const res = await fetch("api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ uid: userId, nickname, mbti }),
@@ -499,7 +499,7 @@
 
   async function submitOutfit(t, b, s) {
     try {
-      await fetch("/api/outfits", {
+      await fetch("api/outfits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ uid: userId, nickname, t, b, s, mbti }),
@@ -515,7 +515,7 @@
     lastQueryCode = code;
     showFellowsLoading();
     try {
-      const res = await fetch(`/api/outfits?t=${t}&b=${b}&s=${s}`);
+      const res = await fetch(`api/outfits?t=${t}&b=${b}&s=${s}`);
       if (!res.ok) throw new Error("http " + res.status);
       const data = await res.json();
       if (lastQueryCode !== code) return; // stale
@@ -1070,7 +1070,7 @@
       params.set("exclude", codeOf(t, b, s));
     }
     try {
-      const res = await fetch(`/api/outfits/recent?${params}`);
+      const res = await fetch(`api/outfits/recent?${params}`);
       if (!res.ok) throw new Error("http " + res.status);
       const data = await res.json();
       renderOthersStrip(data.list || []);
@@ -1132,8 +1132,8 @@
     try {
       const uidParam = userId ? `&uid=${encodeURIComponent(userId)}` : "";
       const url = replace
-        ? `/api/messages?limit=80${uidParam}`
-        : `/api/messages?limit=80&since=${lastBoardTs}${uidParam}`;
+        ? `api/messages?limit=80${uidParam}`
+        : `api/messages?limit=80&since=${lastBoardTs}${uidParam}`;
       const res = await fetch(url);
       if (!res.ok) {
         if (replace) showBoardOffline();
@@ -1219,7 +1219,7 @@
   }
 
   async function postMessage(body) {
-    const res = await fetch("/api/messages", {
+    const res = await fetch("api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ uid: userId, body }),
@@ -1248,7 +1248,7 @@
     btn.classList.add("is-given");
     sproutFlowerBurst(btn);
     try {
-      const res = await fetch(`/api/messages/${encodeURIComponent(mid)}/flower`, {
+      const res = await fetch(`api/messages/${encodeURIComponent(mid)}/flower`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ uid: userId }),
@@ -1390,7 +1390,7 @@
       updateDressingId();
       navigate(((location.hash || "").match(/^#\/(\w+)/) || [, "home"])[1]);
       // background sanity ping
-      fetch(`/api/users/me?uid=${encodeURIComponent(userId)}`)
+      fetch(`api/users/me?uid=${encodeURIComponent(userId)}`)
         .then(r => r.ok ? r.json() : null)
         .then(j => {
           if (j && j.ok) {

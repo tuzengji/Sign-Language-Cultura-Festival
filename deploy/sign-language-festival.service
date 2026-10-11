@@ -1,0 +1,25 @@
+[Unit]
+Description=2026 Sign Language Cultural Festival
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=true
+StateDirectory=sign-language-festival
+WorkingDirectory=/opt/sign-language-festival/current
+ExecStart=/usr/bin/node server/server.mjs
+Environment=HOST=127.0.0.1
+Environment=PORT=8041
+Environment=DATA_DIR=/var/lib/sign-language-festival
+Environment=SEED=off
+Environment=TRUST_PROXY=1
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
