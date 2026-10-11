@@ -4,7 +4,11 @@
 
 一个**手语换装小游戏**：玩家阅读手语动作示意图（不显示文字释义），猜出对应的服装，给主角「手小语」从头到脚搭配一身春装；之后可以在展示墙看到和自己穿一样的同学，在留言区贴一张春日小纸条。
 
-整站是**纯静态前端 + 单文件 Node 服务**，零依赖、零构建步骤、整个项目放进一台 Windows 主机就能给整个校园网用。
+整站是**静态前端 + 单文件 Node 服务**，零依赖、零构建步骤。当前部署在以手予爱服务器，通过 Nginx 子路径提供 HTTPS 访问。
+
+**正式入口**：[2026 手语文化节](https://shouyulove.cn/2026-sign-language-cultural-festival/) · [心创组作品集](https://shouyulove.cn/portfolio/) · [以手予爱主站](https://shouyulove.cn/)
+
+**设计者**：周丽敏 涂增基 黄庭逸
 
 🌸 **GitHub**：<https://github.com/tuzengji/Sign-Language-Cultura-Festival>
 
@@ -46,34 +50,21 @@ PORT=8088 node server/server.mjs
 curl http://localhost:8080/api/health
 ```
 
-需要 **Node 18+**。整库无 `package.json` / 测试 / lint —— 改完直接刷新浏览器或 `node --check` 确认语法。
+需要 **Node 18+**。无需 `package.json` 或构建工具。修改后运行 `node --check game.js`、`node --check server/server.mjs` 和 `python3 tests/smoke.py`，再用浏览器检查桌面与手机。冒烟检查使用临时数据目录，不改动历史玩家数据。
 
-### 数据相关
+### 数据与本地预览
+
+默认本地运行使用 `server/data/`，该目录保存既有玩家记录。需要空数据预览时，使用独立目录并关闭示例数据：
 
 ```bash
-# 清空所有玩家数据（之后启动会自动注入示例种子）
-rm -f server/data/*.jsonl
-
-# 强制重新注入示例数据（不删现有）
-SEED=force node server/server.mjs
+HOST=127.0.0.1 PORT=8088 DATA_DIR=/tmp/sign-festival-preview SEED=off node server/server.mjs
 ```
 
-启动时如三张表全空，`seedDemoData()` 会自动注入 20 位示例同学（`#001 桃酥` … `#020 蜂蜜`）+ 20 套示例造型 + 16 条春日留言，让展示墙和留言区从一开始就不会显得冷清。真实玩家从 `#021` 开始。
+未设置 `SEED=off` 且数据为空时会注入 20 个示例玩家与 16 条示例留言；正式服务固定 `SEED=off`，不会注入模拟记录。不要用重置或强制注入命令处理正式数据。
 
----
+## 早期校园网部署
 
-## 部署到 PKU 校园网
-
-详细操作（Node 安装 / IPv6 地址查询 / 防火墙 / NSSM 服务化 / 数据备份与导出 / 故障排查表）保存在仓库本地的 `部署方案.md` 中（已 gitignore），不上传到 GitHub。
-
-简版：
-
-1. 把整个项目放到 Windows 一台机器（建议 `D:\sign-festival\`）
-2. 装 [Node.js LTS](https://nodejs.org/)
-3. 双击 `start-server.bat` 启动服务
-4. `ipconfig` 找 `2001:da8:` 开头的 IPv6 地址
-5. 管理员 PowerShell 放行 8080 端口：`New-NetFirewallRule -DisplayName "SignFestival 8080" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow`
-6. 把 `http://[2001:da8:....]:8080/` 发给同学
+项目最初支持 Windows + PKU 校园网 IPv6，`start-server.bat` 仍可用于本地启动。当前正式入口与维护流程见本文「以手予爱正式部署」；单独的 Python 静态服务不能提供注册、穿搭和留言 API。
 
 ---
 
@@ -135,3 +126,25 @@ POST /api/messages/:id/flower { uid }                            → 送花，�
 - 发布白名单：`index.html`、`styles.css`、`game.js`、`assets/` 图片与 `server/server.mjs`。历史玩家数据、文档及开发文件不发布。
 - 静态服务只允许页面、脚本、样式和图片，禁止下载服务源码与数据文件。
 - 配置在 `deploy/`。回滚时将 `current` 切回保留的版本并重启本服务；数据目录不随版本切换。
+
+### 日常查看
+
+```bash
+curl https://shouyulove.cn/2026-sign-language-cultural-festival/api/health
+ssh ubuntu@49.232.193.175 'systemctl status sign-language-festival --no-pager'
+ssh ubuntu@49.232.193.175 'sudo journalctl -u sign-language-festival -n 50 --no-pager'
+```
+
+2026-10-11 首次发布目录：`/opt/sign-language-festival/releases/20261011T140000Z`；`current` 指向该版本。服务使用 systemd DynamicUser 与 StateDirectory，进程故障自动重启、随系统启动。Nginx 配置为 `/etc/nginx/snippets/sign-language-festival.conf`，只新增本项目子路径。
+
+### 更新与回滚
+
+1. 修改后通过语法、隔离 API 和桌面／手机浏览器检查。前端 API 必须使用相对地址 `api/...`，保持子路径兼容。
+2. 将运行白名单打包到新的版本目录，核对文件清单与 SHA-256；文档、测试、历史数据、`output/` 和 Git 元数据均不进入线上目录。
+3. 记录当前 `current` 指向和相关 Nginx 配置。用临时符号链接原子切换 `current`，仅重启 `sign-language-festival`；只有修改 Nginx 配置时才在 `nginx -t` 通过后重载 Nginx。
+4. 核验正式页面、健康接口、注册／换装／留言功能与主站入口；实际功能写入测试应在独立测试数据中完成。失败时切回记录的旧版本并重启本服务，保留 `/var/lib/sign-language-festival`。
+5. 将审查后的源码和公开说明提交推送到 `tuzengji/Sign-Language-Cultura-Festival`。本地维护目录没有 `.git`；本次使用 `output/deployment/festival-20261011/repo/` 独立克隆同步 GitHub。不要整体上传维护目录。
+
+本次运行清单、发布脚本和验证记录保存在 `output/deployment/festival-20261011/`。其中 `publish.py` 只用于首次安装，包含「服务尚不存在」检查，不能当成日常更新命令重复执行。
+
+主站文案来源为 `/Users/wishingcat/ObsidianNotes/AI Study/爱心社/心创组主站-以手予爱.md`；修改作品名称、简介、署名或入口后，还需在主站项目重新构建、推送并部署。
