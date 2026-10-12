@@ -158,3 +158,7 @@ ssh ubuntu@49.232.193.175 'sudo journalctl -u sign-language-festival -n 50 --no-
 本机 `server/data/` 已于本次核对：20 名示例玩家、20 套示例穿搭、16 条示例留言，UID 全部为 `demo-uid-` 开头，无真实历史用户，因此未迁移模拟数据。正式服务器已有的新玩家记录保留，数据目录不随这次代码更新改变。
 
 当前图片修复版本：`/opt/sign-language-festival/releases/20261011T142008Z`；原版本保留用于回滚。
+
+## 2026-10-12 项目标识同步
+
+试衣间左上角标识、浏览器图标与 Apple 触屏图标统一使用作品集保留的手小语原人物。人物立绘、服装和手语卡片保留原文件。桌面、平板、390px 与 320px 检查通过；注册验收在浏览器拦截响应，不向正式玩家数据写入记录。发布目录 `/opt/sign-language-festival/releases/20261012T031658Z`。
