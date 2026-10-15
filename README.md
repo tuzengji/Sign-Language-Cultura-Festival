@@ -1,5 +1,11 @@
 # 春日手语园 · A Spring Garden of Signs
 
+## 2026-10-15 阿里云维护入口（流量已切换）
+
+维护 SSH 别名为 `shouyulove-aliyun`，固定连接 `root@101.37.209.227`（ECS `i-bp1hi3u3w5p3vg4owfl0`）。不用 `yanyuan-calendar` 作为本项目的发布入口。2026-10-15 已完成流量与可写服务切换，域名 @、www 已指向该 ECS；DNS、证书、最终页面验收和本站自动续期演练均已通过。
+
+代码 `/opt/sign-language-festival/current`、状态 `/var/lib/sign-language-festival`、服务 `sign-language-festival.service` 与正式子路径保持。unit 保留 `Slice=system-shouyulove.slice`。本次数据切换 gate 已移除，Nginx 已恢复本机后端直连，后续按既有版本目录流程更新。
+
 > 北京大学爱心社手语分社 · 春日手语文化节 · MMXXVI
 
 一个**手语换装小游戏**：玩家阅读手语动作示意图（不显示文字释义），猜出对应的服装，给主角「手小语」从头到脚搭配一身春装；之后可以在展示墙看到和自己穿一样的同学，在留言区贴一张春日小纸条。
@@ -131,8 +137,8 @@ POST /api/messages/:id/flower { uid }                            → 送花，�
 
 ```bash
 curl https://shouyulove.cn/2026-sign-language-cultural-festival/api/health
-ssh ubuntu@49.232.193.175 'systemctl status sign-language-festival --no-pager'
-ssh ubuntu@49.232.193.175 'sudo journalctl -u sign-language-festival -n 50 --no-pager'
+ssh shouyulove-aliyun 'systemctl status sign-language-festival --no-pager'
+ssh shouyulove-aliyun 'sudo journalctl -u sign-language-festival -n 50 --no-pager'
 ```
 
 2026-10-11 首次发布目录：`/opt/sign-language-festival/releases/20261011T140000Z`；`current` 指向该版本。服务使用 systemd DynamicUser 与 StateDirectory，进程故障自动重启、随系统启动。Nginx 配置为 `/etc/nginx/snippets/sign-language-festival.conf`，只新增本项目子路径。

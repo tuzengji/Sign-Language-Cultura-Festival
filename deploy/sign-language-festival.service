@@ -3,6 +3,7 @@ Description=2026 Sign Language Cultural Festival
 After=network.target
 
 [Service]
+Slice=system-shouyulove.slice
 Type=simple
 DynamicUser=true
 StateDirectory=sign-language-festival
